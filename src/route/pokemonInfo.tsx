@@ -14,6 +14,7 @@ import {
 import { stringFormatter, pokeTypeHandler } from "../utils";
 import { AxiosError } from "axios";
 import NotFound from "./notFound";
+import PokeLearnMoreDialog from "../components/pokeLearnMoreDialog";
 
 interface PokeCard {
   id: string;
@@ -40,11 +41,16 @@ export default function PokemonInfo() {
   const pokemon = searchParams.get("pokemon");
   const [cardInfo, setCardInfo] = useState<PokeCard>();
   const [err, setErr] = useState<Number>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const imgUrl = cardInfo?.sprites.other["official-artwork"].front_default;
   const id = cardInfo?.id;
   // TODO: only do this helper when api call is done?
   const type = pokeTypeHandler(cardInfo?.types ?? []);
   const [description, setDescription] = useState<string>();
+
+  const handleClose = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     if (pokemon) {
@@ -92,11 +98,24 @@ export default function PokemonInfo() {
               <Typography variant="h6">{type}</Typography>
             </CardContent>
             <CardActions sx={{ background: "#c4c4c4" }}>
-              <Button size="small">Learn more</Button>
+              <Button
+                size="small"
+                onClick={() => {
+                  setIsModalOpen(true);
+                }}
+              >
+                Learn more
+              </Button>
             </CardActions>
           </Card>
         </Grid>
       </Grid>
+      <PokeLearnMoreDialog
+        open={isModalOpen}
+        handleClose={handleClose}
+        type={cardInfo?.types}
+        img={imgUrl ?? ""}
+      />
     </div>
   ) : null;
 }
